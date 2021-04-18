@@ -1,0 +1,15 @@
+[package]
+name = "xtra_proc"
+version = "0.1.0"
+authors = ["Valerian G. <valerian.garleanu@pm.me>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+quote = "1.0.9"
+syn = { version = "1.0.69", features = ["full"] }
+proc-macro2 = "1.0.26"
