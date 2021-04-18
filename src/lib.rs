@@ -17,21 +17,20 @@ enum Item {
 
 impl Parse for Item {
     fn parse(input: ParseStream) -> Result<Self> {
-        let attrs = input.call(Attribute::parse_outer)?;
         let lookahead = input.lookahead1();
 
         Ok(if lookahead.peek(Token![impl]) {
-            let mut item: ItemImpl = input.parse()?;
+            let item: ItemImpl = input.parse()?;
             Item::Impl(item)
         } else {
-            let mut item: ItemStruct = input.parse()?;
+            let item: ItemStruct = input.parse()?;
             Item::Struct(item)
         })
     }
 }
 
 #[proc_macro_attribute]
-pub fn actor(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn actor(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(input as Item);
     TokenStream::from(match input {
         Item::Struct(x) => actor_struct(x),
@@ -47,10 +46,9 @@ pub fn handler(_: TokenStream, input: TokenStream) -> TokenStream {
 fn actor_struct(item_struct: ItemStruct) -> proc_macro2::TokenStream {
     let ItemStruct {
         attrs,
-        vis,
         ident,
         generics,
-        mut fields,
+        fields,
         semi_token,
         ..
     } = item_struct;
@@ -59,6 +57,7 @@ fn actor_struct(item_struct: ItemStruct) -> proc_macro2::TokenStream {
 
     quote! {
         #[doc(hidden)]
+        #[allow(non_snake_case)]
         mod #actor_mod {
             use super::*;
             #(#attrs)*
@@ -230,10 +229,14 @@ fn generate_msg_struct(actor_name: &Ident, item: &ImplItem) -> proc_macro2::Toke
     };
 
     quote! {
+        #[doc(hidden)]
+        #[allow(non_snake_case)]
         struct #msg_name {
             #(#args),*
         }
 
+        #[doc(hidden)]
+        #[allow(non_snake_case)]
         #xtra_msg_impl
     }
 }
