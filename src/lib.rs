@@ -230,7 +230,7 @@ fn generate_msg_struct(actor_name: &Ident, item: &ImplItem) -> proc_macro2::Toke
 
     quote! {
         #[doc(hidden)]
-        #[allow(non_snake_case)]
+        #[allow(non_camel_case_types)]
         struct #msg_name {
             #(#args),*
         }
