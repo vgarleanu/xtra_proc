@@ -131,6 +131,7 @@ fn actor_impl(item_impl: ItemImpl) -> proc_macro2::TokenStream {
             #(#handler_methods)*
         }
 
+        #[derive(Clone)]
         pub struct #name {
             addr: ::xtra::Address<#mod_name::#name>,
         }
