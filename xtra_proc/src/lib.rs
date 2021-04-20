@@ -110,6 +110,8 @@ fn actor_impl(item_impl: ItemImpl) -> proc_macro2::TokenStream {
         _ => unreachable!(),
     });
 
+    let arglist_clone = arglist.clone();
+
     let actor_creator = quote! {
         pub fn new<S: ::xtra::spawn::Spawner>(spawner: &mut S, #(#args),*) -> Self {
             use ::xtra::Actor;
@@ -117,6 +119,20 @@ fn actor_impl(item_impl: ItemImpl) -> proc_macro2::TokenStream {
             Self {
                 addr: #mod_name::#name::new(#(#arglist),*).create(None).spawn(spawner),
             }
+        }
+
+        pub fn cluster<S: ::xtra::spawn::Spawner>(
+            spawner: &mut S,
+            cluster_size: usize,
+            #(#args),*
+        ) -> (::xtra::Context<#mod_name::#name>, Self) {
+            use ::xtra::Actor;
+            let (addr, mut ctx) = ::xtra::Context::<#mod_name::#name>::new(None);
+            for _ in 0..cluster_size {
+                spawner.spawn(ctx.attach(#mod_name::#name::new(#(#arglist_clone),*)));
+            }
+
+            (ctx, Self { addr })
         }
     };
 
