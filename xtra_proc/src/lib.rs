@@ -196,11 +196,21 @@ fn generate_api_method(actor_name: &Ident, item: &ImplItem) -> proc_macro2::Toke
         _ => unreachable!(),
     });
 
+    let arglist_clone = arglist.clone();
+
+    let no_wait_fn_name = format_ident!("{}_no_wait", &fn_name);
+
     quote! {
         pub async fn #fn_name(&self, #(#args),*) #ret_type {
             self.addr.send(#msg_name {
                 #(#arglist),*
             }).await.expect("Actor has died.")
+        }
+
+        pub fn #no_wait_fn_name(&self, #(#args),*) {
+            self.addr.do_send(#msg_name {
+                #(#arglist_clone),*
+            }).expect("Actor has died.");
         }
     }
 }
