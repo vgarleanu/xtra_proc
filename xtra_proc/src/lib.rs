@@ -110,7 +110,7 @@ fn actor_impl(item_impl: ItemImpl) -> proc_macro2::TokenStream {
         _ => unreachable!(),
     });
 
-    let arglist_clone = arglist.clone();
+    let arglist_clone = arglist.clone().map(|x| quote!(#x.clone()));
 
     let actor_creator = quote! {
         pub fn new<S: ::xtra::spawn::Spawner>(spawner: &mut S, #(#args),*) -> Self {
